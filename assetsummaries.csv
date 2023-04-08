@@ -1,2 +1,2 @@
 Ticker,Summary,Label,Confidence,Url
-TSLA,"NikolaCorpNKLAalsomadeheadlines asitcelebrated100saleordersforClass8FCEV. However,sharesofthecompanywerebrutallypunished afterthecompanyannounceda$100millionstocksaleplan. TeslacarriesaZacksRank#4(Sell)and NIOis#5 ranked (StrongSell).","{'label': 'NEGATIVE', 'score': 0.9904288053512573}",https://finance.yahoo.com/news/ev-roundup-tsla-q1-deliveries-141002509.html
+MSFT,Googlesaidthesystemsarefasterandmorepower-efficientthancomparablesystems from N NvidiaCorp. The company's Bard and MicrosoftCorp'sbackedChatGPT-WhatItTakesToTrainAI.,"{'label': 'NEGATIVE', 'score': 0.952090859413147}",https://finance.yahoo.com/news/googles-bard-vs-microsoft-backed-140424897.html
