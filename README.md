@@ -1,16 +1,19 @@
 # XPay_Finance_Beta
 Machine Learning Project that uses BERT Deep Learning and Encoder-Decoder NLP
-NB : This ML model is under Training and may occasionally generate wrong Data
-![description](img4.jpg)
+NB : This ML model is Novel and may occasionally generate wrong Data
+
+## Theoretical Background 
+![description](img4png)
+### Architectures 
+![description](images/BERT.png)
+![description](images/BART.png)
+![description](images/over_view.png)
+
 # Installing & Usage
+![description](images/cover.png)
 1. clone the repo to your local machine ; Open in VScode (Have Jupyter Environment installed)
-2. Open Terminal and Run `pip install sentencepiece tensorflow requests re bs4 transformers torch`
-3. Start Running the code blocks one by one 
-4. In when you reach code 3, Input the Number of tickers you want to monitor
-![Demo image](img1.png)
-5. Still in Code block 3, Input the Stock Ticker(I used "TSLA")
-![Ticker image](img2.png)
-6. Run the code blocks and observe the output from block 8 
-![Ticker image](img3.png)
-# Collaboration Request
+2. Open Terminal and Run `pip install requirements.txt`
+3. In the same terminal window, run streamlit run app.py
+4. As on the window above, a stock ticker is the 4-code stock symbol i.e APPL
+5. The model takes a few minutes to train and output per stock ticker
 contact me here : https://www.linkedin.com/in/misango/
