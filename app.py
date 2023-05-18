@@ -17,7 +17,7 @@ sentiment = pipeline('sentiment-analysis', model=model, tokenizer=tokenizer)
 def search_for_stock_news_urls(ticker, source):
     if source == "Bloomberg":
         search_url = f"https://www.google.com/search?q=bloomberg+{ticker}&tbm=nws"
-    elif source == "Yahoo":
+    elif source == "Yahoo Finance":
         search_url = f"https://www.google.com/search?q=yahoo+finance+{ticker}&tbm=nws"
     elif source == "Investopedia":
         search_url = f"https://www.google.com/search?q=investopedia+{ticker}&tbm=nws"
@@ -30,7 +30,7 @@ def search_for_stock_news_urls(ticker, source):
     soup = BeautifulSoup(r.text, 'html.parser')
     if source == "Bloomberg":
         atags = soup.find_all('a')
-    elif source == "Yahoo":
+    elif source == "Yahoo Finance":
         atags = soup.find_all('a')
     elif source == "Investopedia":
         atags = soup.find_all('a')
@@ -45,6 +45,8 @@ def search_for_stock_news_urls(ticker, source):
 #Strip out the unwanted URLs--> policies,accounts, preferences etc
 excluded_list = ['maps', 'policies', 'preferences', 'support', 'accounts']
 def strip_unwanted_urls(urls, excluded_list):
+    if urls is None:
+        return []
     final_val = []
     for url in urls:
         if 'https://' in url and not any(excluded_word in url for excluded_word in excluded_list):
@@ -63,8 +65,8 @@ def scrape_and_process(urls):
             paragraphs = soup.find_all('p')
             text = [paragraph.text for paragraph in paragraphs]
             words = ''.join(text).split(' ')[:400]
-            ARTICLE = ''.join(words)
-            ARTICLES.append(ARTICLE)
+            article = ''.join(words)
+            ARTICLES.append(article)
         except:
             print(f"Error occurred while scraping {url}")
             continue
@@ -76,8 +78,9 @@ def summarize_all_articles(articles):
     summaries = []
     for article in articles:
         # Use the summarizer pipeline to generate a summary
-        summary = summarizer(article, max_length=120, min_length=30, do_sample=False)[0]['summary_text']
-        summaries.append(summary)
+        summary = summarizer(article, max_length=120, min_length=30, do_sample=False)
+        if len(summary) > 0:
+            summaries.append(summary[0]['summary_text'])
     return summaries
 
 stop_words = [
@@ -87,8 +90,8 @@ stop_words = [
 ]
 def perform_sentiment_analysis(summaries, monitored_tickers):
     scores = {
-        ticker: sentiment(summaries[ticker])
-        for ticker in monitored_tickers
+        ticker: sentiment(summary)
+        for ticker, summary in summaries.items()
     }
     return scores
 
@@ -111,36 +114,26 @@ def main():
         cleaned_urls = {ticker:strip_unwanted_urls(raw_urls[ticker], excluded_list) for ticker in monitored_tickers}
         articles = {ticker:scrape_and_process(cleaned_urls[ticker]) for ticker in monitored_tickers}
         summaries = {ticker:summarize_all_articles(articles[ticker]) for ticker in monitored_tickers}
-
-        # Perform sentiment analysis
+    
         scores = perform_sentiment_analysis(summaries, monitored_tickers)
 
-        # Display results
         for ticker in scores:
-            st.subheader(f"Sentiment analysis for {ticker}:")
+            st.header(f"Analysis for {ticker}:")
             for i, score in enumerate(scores[ticker]):
                 summary = summaries[ticker][i]
                 if any(word in summary for word in stop_words) or re.match(r'^\s*$', summary):
                     continue  # Skip if the sentiment contains stop words or phrases, or is blank
-            negative_count = sum(1 for score in scores[ticker] if score['label'] == 'NEGATIVE')
+                st.write(f"{i+1}. Summary: {summary}")
+                st.write(f"   Score: {score['score']}, Label: {score['label']}")
+            negative_count = sum(
+                1 for score in scores[ticker] if score['label'] == 'NEGATIVE'
+            )
             if negative_count > 5:
                 st.warning(f"The model finds that stock {ticker} is not doing well currently. We recommend that you don't buy for short holding.")
-                querry_button = st.button("See Why")
-                if querry_button:
-                    st.write(f"{i+1}. Summary: {summary}")
-                    st.write(f"   Score: {score['score']}, Label: {score['label']}")
             elif negative_count == 5:
-                st.warning(f"The model generates a neutral view on stock {ticker}, further research is needed: Bloomberg / Expedia refinement.")
-                querry_button = st.button("See Why")
-                if querry_button:
-                    st.write(f"{i+1}. Summary: {summary}")
-                    st.write(f"   Score: {score['score']}, Label: {score['label']}")
+                st.info(f"The model generates a neutral view on stock {ticker}, further research is needed: Bloomberg / Expedia refinement.")
             elif negative_count < 5:
-                st.success(f"The model finds that stock {ticker} is good to buy for the short term. Contact our brokers to buy.")
-                querry_button = st.button("See Why")
-                if querry_button:
-                    st.write(f"{i+1}. Summary: {summary}")
-                    st.write(f"   Score: {score['score']}, Label: {score['label']}")
+                st.success(f"The model finds that stock {ticker} is good to buy for the short term. Contact our brokers to buy.") 
 
 if __name__ == '__main__':
     main()

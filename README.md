@@ -16,5 +16,6 @@ NB : This ML model is Novel and may occasionally generate wrong Data
 3. In the same terminal window, run streamlit run app.py
 4. As on the window above, a stock ticker is the 4-code stock symbol i.e APPL
 5. The model takes a few minutes to train and output per stock ticker
+6. To understand deeply how the model works, Investigate the .ipynb file
 
 contact me here : https://www.linkedin.com/in/misango/
