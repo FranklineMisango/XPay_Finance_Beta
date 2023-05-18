@@ -122,17 +122,21 @@ def main():
                 summary = summaries[ticker][i]
                 if any(word in summary for word in stop_words) or re.match(r'^\s*$', summary):
                     continue  # Skip if the sentiment contains stop words or phrases, or is blank
-
-                negative_count = sum(1 for score in scores[ticker] if score['label'] == 'NEGATIVE')
-
-                if negative_count > 5:
-                    message = f"The model finds that stock {ticker} is not doing well currently. We recommend that you don't buy for short holding."
-                elif negative_count == 5:
-                    message = f"The model generates a neutral view on stock {ticker}, further organic research is needed"
-                else:
-                    message = f"The model finds that stock {ticker} is good to buy for the short term. Contact our brokers below to buy."
-
-                st.warning(message)
+            negative_count = sum(1 for score in scores[ticker] if score['label'] == 'NEGATIVE')
+            if negative_count > 5:
+                st.warning(f"The model finds that stock {ticker} is not doing well currently. We recommend that you don't buy for short holding.")
+                querry_button = st.button("See Why")
+                if querry_button:
+                    st.write(f"{i+1}. Summary: {summary}")
+                    st.write(f"   Score: {score['score']}, Label: {score['label']}")
+            elif negative_count == 5:
+                st.warning(f"The model generates a neutral view on stock {ticker}, further research is needed: Bloomberg / Expedia refinement.")
+                querry_button = st.button("See Why")
+                if querry_button:
+                    st.write(f"{i+1}. Summary: {summary}")
+                    st.write(f"   Score: {score['score']}, Label: {score['label']}")
+            elif negative_count < 5:
+                st.success(f"The model finds that stock {ticker} is good to buy for the short term. Contact our brokers to buy.")
                 querry_button = st.button("See Why")
                 if querry_button:
                     st.write(f"{i+1}. Summary: {summary}")
